@@ -2,6 +2,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <regex>
 
 #include "graph.h"
 
@@ -37,6 +38,14 @@ Graph::Graph(const string &filename) : nodeMap(g) {
         else if (line.find("DEPOT_SECTION") != string::npos) {
             readingDemand = false;
             readingDepot = true;
+        }
+        else if(line.find("VEHICLES") != string::npos or line.find("trucks") != string::npos){
+            std::regex r ("[[:digit:]]+");
+            std::smatch s;
+            std::regex_search(line,s,r);
+            std::cout << "Vehicles "<< s[0] << "\n";
+            vehicles = stoi(s[0]);
+
         }
         else {
             // Extract data from the line. There is at most three strings that matter to us for each line.
@@ -86,6 +95,6 @@ void Graph::print() const {
 }
 
 int main () {
-    Graph g("../data/A/A-n32-k5.vrp");
+    Graph g("../data/A/A-n80-k10.vrp");
     g.print();
 }

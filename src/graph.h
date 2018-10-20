@@ -33,6 +33,7 @@ namespace maoa {
 		lemon::FullGraph::NodeMap<NodeData> nodeMap;
 		lemon::FullGraph::Node depot;
 		float capacity;
+		int vehicles;
 	};
 }
 
