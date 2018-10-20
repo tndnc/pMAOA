@@ -6,9 +6,12 @@
 
 #include "graph.h"
 #include "gnuplot.h"
+#include "heuristic_c.h"
 
 using std::string;
 using namespace maoa;
+using Node = lemon::FullGraph::Node;
+using NodeMap = lemon::FullGraph::NodeMap<NodeData>;
 
 Graph::Graph(const string &filename) : nodeMap(g) {
 
@@ -62,18 +65,18 @@ Graph::Graph(const string &filename) : nodeMap(g) {
                 continue;
             }
             if (data[0] == "CAPACITY") {
-                capacity = stof(data[2]);
+                Q = stof(data[2]);
                 continue;
             }
             if (readingCoord) {
                 // Add Node to graph.
                 int nodeIndex = stoi(data[0]) - 1;
-                lemon::FullGraph::Node u = g(nodeIndex);
+                Node u = g(nodeIndex);
                 nodeMap[u].x = stof(data[1]);
                 nodeMap[u].y = stof(data[2]);
             }
             else if (readingDemand) {
-                lemon::FullGraph::Node u = g(stoi(data[0]) - 1);
+                Node u = g(stoi(data[0]) - 1);
                 nodeMap[u].demand = stof(data[1]);
             }
             else if (readingDepot) {
@@ -88,11 +91,11 @@ void Graph::print() const {
     int nodeNum = g.nodeNum();
     int i;
     for (i = 0; i < nodeNum; i++) {
-        lemon::FullGraph::Node u = g(i);
+        Node u = g(i);
         std::cout << nodeMap[u].to_string() << std::endl;
     }
     std::cout << "Depot: " << g.id(depot) << std::endl;
-    std::cout << "Capacity: " << capacity << std::endl;
+    std::cout << "Capacity: " << Q << std::endl;
 }
 
 void Graph::draw() {
@@ -104,7 +107,7 @@ void Graph::draw() {
     int nodeNum = g.nodeNum();
     int i;
     for (i = 0; i < nodeNum; i++) {
-        lemon::FullGraph::Node u = g(i);
+        Node u = g(i);
         outfile << nodeMap[u].x << " " << nodeMap[u].y << std::endl;
     }
 
@@ -115,6 +118,7 @@ void Graph::draw() {
 
 int main () {
     Graph g("../data/A/A-n32-k5.vrp");
-    g.print();
-    g.draw();
+//    g.print();
+//    g.draw();
+    std::vector<Tour> solution = constructSolution(g);
 }

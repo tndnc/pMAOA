@@ -22,18 +22,21 @@ namespace maoa {
 	public:
         explicit Graph(const string & filename);
 
-		inline double getDistance(const lemon::FullGraph::Node & v1, const lemon::FullGraph::Node & v2) const {
+		double getDistance(const lemon::FullGraph::Node & v1, const lemon::FullGraph::Node & v2) const {
             NodeData d1 = nodeMap[v1];
             NodeData d2 = nodeMap[v2];
             return sqrt(pow(d1.x - d2.x, 2) + pow(d1.y - d2.y, 2));
         }
         void print() const;
 		void draw();
+		inline int vehiclesNum() { return vehicles;	}
+		inline float capacity() { return Q; }
+		inline int nodeNum() { return g.nodeNum(); }
 	private:
 		lemon::FullGraph g;
 		lemon::FullGraph::NodeMap<NodeData> nodeMap;
 		lemon::FullGraph::Node depot;
-		float capacity;
+		float Q;
 		int vehicles;
 	};
 }
