@@ -5,6 +5,7 @@
 #include <regex>
 
 #include "graph.h"
+#include "gnuplot.h"
 
 using std::string;
 using namespace maoa;
@@ -94,7 +95,26 @@ void Graph::print() const {
     std::cout << "Capacity: " << capacity << std::endl;
 }
 
+void Graph::draw() {
+    gnuplot plot;
+    std::ofstream outfile;
+
+    outfile.open("../points.dat");
+
+    int nodeNum = g.nodeNum();
+    int i;
+    for (i = 0; i < nodeNum; i++) {
+        lemon::FullGraph::Node u = g(i);
+        outfile << nodeMap[u].x << " " << nodeMap[u].y << std::endl;
+    }
+
+    outfile.close();
+
+    plot("plot \"../points.dat\" pt 4 ps 1 lc rgb 'blue' notitle");
+}
+
 int main () {
-    Graph g("../data/A/A-n80-k10.vrp");
+    Graph g("../data/A/A-n32-k5.vrp");
     g.print();
+    g.draw();
 }

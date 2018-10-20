@@ -28,6 +28,7 @@ namespace maoa {
             return sqrt(pow(d1.x - d2.x, 2) + pow(d1.y - d2.y, 2));
         }
         void print() const;
+		void draw();
 	private:
 		lemon::FullGraph g;
 		lemon::FullGraph::NodeMap<NodeData> nodeMap;

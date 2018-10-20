@@ -7,4 +7,4 @@ include_directories(src lib/lemon/include)
 
 add_executable(pmaoa
         src/graph.cpp
-        src/graph.h)
+        src/graph.h src/gnuplot.h)
