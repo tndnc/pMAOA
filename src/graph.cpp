@@ -1,64 +1,91 @@
+#include <cstring>
+#include <sstream>
+#include <fstream>
+#include <iostream>
+
 #include "graph.h"
-#include<cstring>
-#include<sstream>
-#include<fstream>
-#include<iostream>
 
-#include <lemon/list_graph.h>
-#include <lemon/dim2.h>
+using std::string;
+using namespace maoa;
 
-using namespace std;
-using namespace lemon;
+Graph::Graph(const string &filename) : nodeMap(g) {
 
-/*
-void C_Graph::read_undirected_complete_TSP(istream & fic){
+    std::ifstream infile;
+    infile.open(filename);
 
-
-
-*/
-void VrpReader::readVrpFiles(string fileName, ListDigraph g){
-
-  ifstream inFile;
-  inFile.open(fileName);
-  if ( !inFile ) {
-      cout << "Unable to open file : " << fileName << "\n";
-    exit(1);
-  }
-
-  string line;
-  ListDigraph::NodeMap<dim2::Point<int>> coord(g);
-  bool readCoord = false;
-  bool readSection = false;
-  int data [3] = { };
-  while ( getline(inFile, line) ) {
-    if(readCoord){
-      if(line.find("DEMAND_SECTION") != string::npos){
-        readCoord = false;
-        readSection = true;
-        continue;
-        }
-      stringstream stream(line);
-      ListDigraph::Node u = g.addNode();
-      for (int i = 0; i < 3;i++){
-        int n;
-        stream >> n;
-        if(i == 1){
-          coord[u].x = n;
-        }else if(i == 2){
-          coord[u].y = n;
-        }
-      }
+    if (!infile) {
+        std::cout << "Unable to open file : " << filename << std::endl;
+        exit(1);
     }
-    if(line.find("NODE_COORD_SECTION") != string::npos)
-      readCoord = true;
-    if(line.find("DEPOT_SECTION") != string::npos)
-      readSection = false;  
-  }
+
+    string line;
+    string data[3];
+    int i;
+
+    bool readingCoord = false;
+    bool readingDemand = false;
+    bool readingDepot = false;
+
+    while (getline(infile, line)) {
+        if (line.find("NODE_COORD_SECTION") != string::npos) {
+            readingCoord = true;
+        }
+        else if (line.find("DEMAND_SECTION") != string::npos) {
+            readingCoord = false;
+            readingDemand = true;
+        }
+        else if (line.find("DEPOT_SECTION") != string::npos) {
+            readingDemand = false;
+            readingDepot = true;
+        }
+        else {
+            // Extract data from the line. There is at most three strings that matter to us for each line.
+            std::stringstream lineStream(line);
+            string temp;
+            i = 0;
+            while (!lineStream.eof() && i < 3) {
+                lineStream >> data[i];
+                i++;
+            }
+            if (data[0] == "DIMENSION") {
+                g.resize(stoi(data[2]));
+                continue;
+            }
+            if (data[0] == "CAPACITY") {
+                capacity = stof(data[2]);
+                continue;
+            }
+            if (readingCoord) {
+                // Add Node to graph.
+                int nodeIndex = stoi(data[0]) - 1;
+                lemon::FullGraph::Node u = g(nodeIndex);
+                nodeMap[u].x = stof(data[1]);
+                nodeMap[u].y = stof(data[2]);
+            }
+            else if (readingDemand) {
+                lemon::FullGraph::Node u = g(stoi(data[0]) - 1);
+                nodeMap[u].demand = stof(data[1]);
+            }
+            else if (readingDepot) {
+                depot = g(stoi(data[0]) - 1);
+                break;
+            }
+        }
+    }
 }
 
-int main(int argc,char**argv){
-  ListDigraph g;
-  VrpReader vr;
-  //VrpReader *vr = new VrpReader();
-  vr.readVrpFiles(argv[1],g);
+void Graph::print() const {
+    int nodeNum = g.nodeNum();
+    int i;
+    for (i = 0; i < nodeNum; i++) {
+        lemon::FullGraph::Node u = g(i);
+        std::cout << nodeMap[u].to_string() << std::endl;
+    }
+    std::cout << "Depot: " << g.id(depot) << std::endl;
+    std::cout << "Capacity: " << capacity << std::endl;
+}
+
+int main () {
+    Graph g("../data/A/A-n32-k5.vrp");
+    g.print();
 }
