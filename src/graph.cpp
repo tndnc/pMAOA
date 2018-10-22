@@ -94,7 +94,7 @@ void Graph::print() const {
         Node u = g(i);
         std::cout << nodeMap[u].to_string() << std::endl;
     }
-    std::cout << "Depot: " << g.id(depot) << std::endl;
+    std::cout << "Depot: " << depotId() << std::endl;
     std::cout << "Capacity: " << Q << std::endl;
 }
 
@@ -114,11 +114,4 @@ void Graph::draw() {
     outfile.close();
 
     plot("plot \"../points.dat\" pt 4 ps 1 lc rgb 'blue' notitle");
-}
-
-int main () {
-    Graph g("../data/A/A-n32-k5.vrp");
-//    g.print();
-//    g.draw();
-    std::vector<Tour> solution = constructSolution(g);
 }

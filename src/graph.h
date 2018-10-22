@@ -25,19 +25,40 @@ namespace maoa {
 		double getDistance(const lemon::FullGraph::Node & v1, const lemon::FullGraph::Node & v2) const {
             NodeData d1 = nodeMap[v1];
             NodeData d2 = nodeMap[v2];
-            return sqrt(pow(d1.x - d2.x, 2) + pow(d1.y - d2.y, 2));
+            return eucDist(d1, d2);
         }
+        double getDistance(int n1, int n2) const {
+            return getDistance(g(n1), g(n2));
+		}
         void print() const;
 		void draw();
-		inline int vehiclesNum() { return vehicles;	}
-		inline float capacity() { return Q; }
-		inline int nodeNum() { return g.nodeNum(); }
+		int vehiclesNum() const { return vehicles;	}
+		float capacity() const { return Q; }
+		int nodeNum() const { return g.nodeNum(); }
+		int depotId() const { return g.id(depot); }
+		lemon::FullGraph::Node operator()(int nodeId) const {
+		    return g(nodeId);
+		}
+		float getDemand(lemon::FullGraph::Node u) const {
+		    return nodeMap[u].demand;
+		}
+		NodeData getData(lemon::FullGraph::Node u) const {
+		    return nodeMap[u];
+		}
+		NodeData getData(int nodeId) const {
+		    lemon::FullGraph::Node u = g(nodeId);
+		    return getData(u);
+		}
 	private:
 		lemon::FullGraph g;
 		lemon::FullGraph::NodeMap<NodeData> nodeMap;
 		lemon::FullGraph::Node depot;
 		float Q;
 		int vehicles;
+
+		double eucDist(NodeData & d1, NodeData & d2) const {
+		    return sqrt(pow(d1.x - d2.x, 2) + pow(d1.y - d2.y, 2));
+		}
 	};
 }
 
