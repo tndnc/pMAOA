@@ -4,6 +4,8 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <map>
+
 
 #include "graph.h"
 
@@ -12,9 +14,9 @@ using std::string;
 namespace ace{
 
     struct ant{
-        int id;
-        std::list<int> visited;
+        int id, visited;
         std::list<int> path;
+        std::list<int>::iterator it;
         float capacity;
         int position;
         int score;
@@ -24,16 +26,19 @@ namespace ace{
             ss << "Ant #" << id << "\n";
             return ss.str();
         };
-
     };
 
     class aceHeutistic {
     public:
         explicit aceHeutistic(const string & filename);
-        void run(int nb_iter, int nb_ants, float beta, float alpha, float q0, float t0);
+        void run(int nb_iter, int nb_ants, int beta, float alpha, float q0, float t0);
+        std::map<string,float> pheromones;
     private:
-        void selectNode(ant);
+        void selectNode(ant& a,float q0,int beta);
         void updatePheromones();
-        void evaporatePheromones();
+        void evaporatePheromones(float alpha, float t0);
+        float getpheromones(int nodeA,int nodeB);
         maoa::Graph * g;
     };
+
+#endif
