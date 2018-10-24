@@ -51,14 +51,14 @@ namespace maoa {
 		std::list<int> getNodesIndexes() const {
 			std::list<int> nodesIndexes;
 			std::list<int>::iterator it;
-			for (lemon::FullGraph::NodeIt n(g); n != lemon::INVALID; ++n) {
-				nodesIndexes.insert(it, g.id(n));
+			for (lemon::FullGraph::NodeIt n(_g); n != lemon::INVALID; ++n) {
+				nodesIndexes.insert(it, _g.id(n));
 				++it;
 			}
 			return  nodesIndexes;
 		}
 		int arcNum() const {
-			return g.arcNum();
+			return _g.arcNum();
 		};
 
 	private:
