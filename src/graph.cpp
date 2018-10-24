@@ -5,15 +5,13 @@
 #include <regex>
 
 #include "graph.h"
-#include "gnuplot.h"
-#include "heuristic_c.h"
 
 using std::string;
 using namespace maoa;
 using Node = lemon::FullGraph::Node;
 using NodeMap = lemon::FullGraph::NodeMap<NodeData>;
 
-Graph::Graph(const string &filename) : nodeMap(g) {
+Graph::Graph(const string &filename) : _nodeMap(_g) {
 
     std::ifstream infile;
     infile.open(filename);
@@ -48,7 +46,7 @@ Graph::Graph(const string &filename) : nodeMap(g) {
             std::smatch s;
             std::regex_search(line,s,r);
             std::cout << "Vehicles "<< s[0] << "\n";
-            vehicles = stoi(s[0]);
+            _vehicles = stoi(s[0]);
 
         }
         else {
@@ -61,26 +59,26 @@ Graph::Graph(const string &filename) : nodeMap(g) {
                 i++;
             }
             if (data[0] == "DIMENSION") {
-                g.resize(stoi(data[2]));
+                _g.resize(stoi(data[2]));
                 continue;
             }
             if (data[0] == "CAPACITY") {
-                Q = stof(data[2]);
+                _Q = stof(data[2]);
                 continue;
             }
             if (readingCoord) {
                 // Add Node to graph.
                 int nodeIndex = stoi(data[0]) - 1;
-                Node u = g(nodeIndex);
-                nodeMap[u].x = stof(data[1]);
-                nodeMap[u].y = stof(data[2]);
+                Node u = _g(nodeIndex);
+                _nodeMap[u].x = stof(data[1]);
+                _nodeMap[u].y = stof(data[2]);
             }
             else if (readingDemand) {
-                Node u = g(stoi(data[0]) - 1);
-                nodeMap[u].demand = stof(data[1]);
+                Node u = _g(stoi(data[0]) - 1);
+                _nodeMap[u].demand = stof(data[1]);
             }
             else if (readingDepot) {
-                depot = g(stoi(data[0]) - 1);
+                _depotId = stoi(data[0]) - 1;
                 break;
             }
         }
@@ -88,30 +86,12 @@ Graph::Graph(const string &filename) : nodeMap(g) {
 }
 
 void Graph::print() const {
-    int nodeNum = g.nodeNum();
+    int nodeNum = _g.nodeNum();
     int i;
     for (i = 0; i < nodeNum; i++) {
-        Node u = g(i);
-        std::cout << nodeMap[u].to_string() << std::endl;
+        Node u = _g(i);
+        std::cout << _nodeMap[u].to_string() << std::endl;
     }
     std::cout << "Depot: " << depotId() << std::endl;
-    std::cout << "Capacity: " << Q << std::endl;
-}
-
-void Graph::draw() {
-    gnuplot plot;
-    std::ofstream outfile;
-
-    outfile.open("../points.dat");
-
-    int nodeNum = g.nodeNum();
-    int i;
-    for (i = 0; i < nodeNum; i++) {
-        Node u = g(i);
-        outfile << nodeMap[u].x << " " << nodeMap[u].y << std::endl;
-    }
-
-    outfile.close();
-
-    plot("plot \"../points.dat\" pt 4 ps 1 lc rgb 'blue' notitle");
+    std::cout << "Capacity: " << _Q << std::endl;
 }

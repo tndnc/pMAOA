@@ -22,31 +22,30 @@ namespace maoa {
 	public:
         explicit Graph(const string & filename);
 
-		double getDistance(const lemon::FullGraph::Node & v1, const lemon::FullGraph::Node & v2) const {
-            NodeData d1 = nodeMap[v1];
-            NodeData d2 = nodeMap[v2];
-            return eucDist(d1, d2);
+		double getDistance(const lemon::FullGraph::Node &v1, const lemon::FullGraph::Node &v2) const {
+            NodeData d1 = _nodeMap[v1];
+            NodeData d2 = _nodeMap[v2];
+            return _eucDist(d1, d2);
         }
         double getDistance(int n1, int n2) const {
-            return getDistance(g(n1), g(n2));
+            return getDistance(_g(n1), _g(n2));
 		}
         void print() const;
-		void draw();
-		int vehiclesNum() const { return vehicles;	}
-		float capacity() const { return Q; }
-		int nodeNum() const { return g.nodeNum(); }
-		int depotId() const { return g.id(depot); }
+		int vehiclesNum() const { return _vehicles;	}
+		float capacity() const { return _Q; }
+		int nodeNum() const { return _g.nodeNum(); }
+		int depotId() const { return _depotId; }
 		lemon::FullGraph::Node operator()(int nodeId) const {
-		    return g(nodeId);
+		    return _g(nodeId);
 		}
 		float getDemand(lemon::FullGraph::Node u) const {
-		    return nodeMap[u].demand;
+		    return _nodeMap[u].demand;
 		}
 		NodeData getData(lemon::FullGraph::Node u) const {
-		    return nodeMap[u];
+		    return _nodeMap[u];
 		}
 		NodeData getData(int nodeId) const {
-		    lemon::FullGraph::Node u = g(nodeId);
+		    lemon::FullGraph::Node u = _g(nodeId);
 		    return getData(u);
 		}
 		std::list<int> getNodesIndexes() const {
@@ -63,14 +62,35 @@ namespace maoa {
 		};
 
 	private:
-		lemon::FullGraph g;
-		lemon::FullGraph::NodeMap<NodeData> nodeMap;
-		lemon::FullGraph::Node depot;
-		float Q;
-		int vehicles;
+		lemon::FullGraph _g;
+		lemon::FullGraph::NodeMap<NodeData> _nodeMap;
+		int _depotId;
+		float _Q;
+		int _vehicles;
 
-		double eucDist(NodeData & d1, NodeData & d2) const {
+		double _eucDist(NodeData &d1, NodeData &d2) const {
 		    return sqrt(pow(d1.x - d2.x, 2) + pow(d1.y - d2.y, 2));
+		}
+	};
+
+	struct Tour {
+	private:
+		std::list<int> cities;
+	public:
+		float capacity;
+		Tour() : capacity(0) {}
+		int getCity(unsigned long idx) { return cities.at(idx); }
+		unsigned long size() const { return cities.size(); }
+		void addCity(int nodeId, float c) {
+			cities.push_back(nodeId);
+			capacity += c;
+		}
+		void print() const {
+			for (int c : cities) {
+				std::cout << c << " ";
+			}
+			std::cout << std::endl << "Capacity: " << capacity << std::endl;
+			std::cout << "Size: " << cities.size() << std::endl;
 		}
 	};
 }

@@ -1,15 +1,11 @@
 #include <vector>
 #include <random>
-#include <algorithm>
-#include <fstream>
 
-#include "heuristic_c.h"
-#include "graph.h"
-//#include "gnuplot.h"
+#include "bp_heuristic.h"
 
 namespace maoa {
 
-    std::vector<Tour> constructClusters(Graph & g) {
+    std::vector<Tour> constructClusters(Graph &g) {
 
         std::vector<Tour> clusters;
         Tour currentCluster;
@@ -73,7 +69,7 @@ namespace maoa {
                     std::cout << "New starting point: " << startingPoint << std::endl;
                     s = g(startingPoint);
                     currentCluster.addCity(startingPoint, g.getDemand(s));
-                    nodeIds.erase(it, std::next(it));
+                    nodeIds.erase(--nodeIds.end(), nodeIds.end());
                     // Sort cities according to new starting point
                     nodeIds.sort([&](int a, int b) {
                         return g.getDistance(a, startingPoint) > g.getDistance(b, startingPoint);
@@ -83,48 +79,8 @@ namespace maoa {
             }
         }
 
+        clusters.push_back(currentCluster);
         return clusters;
     }
-
-    void drawClusters(std::vector<Tour> & clusters, Graph & g) {
-        int colors[5][3] = {{89, 201, 165},
-                            {216, 30, 91},
-                            {35, 57, 91},
-                            {255, 253, 152},
-                            {100, 87, 166}};
-
-//        gnuplot plot;
-        std::ofstream outfile;
-        outfile.open("../points.dat");
-
-        int i;
-        int color_idx = 0;
-        unsigned long length;
-        for (Tour & t : clusters) {
-            length = t.size();
-            for (i = 0; i < length; i++) {
-                NodeData data = g.getData(t.getCity(i));
-                outfile << data.x << ' ' << data.y << ' ';
-                outfile << colors[color_idx][0] << ' ' << colors[color_idx][1]
-                        << ' ' << colors[color_idx][2] << std::endl;
-            }
-            color_idx++;
-        }
-
-        outfile.close();
-    }
-}
-
-int main () {
-    maoa::Graph g("../data/A/A-n32-k5.vrp");
-//    g.print();
-//    g.draw();
-    std::vector<maoa::Tour> solution = constructClusters(g);
-
-    for (auto & c : solution) {
-        c.print();
-    }
-
-    drawClusters(solution, g);
 }
 
