@@ -19,7 +19,8 @@ namespace ace{
         std::list<int>::iterator it;
         float capacity;
         int position;
-        int score;
+        float score;
+        float distance;
 
         string to_string() const {
             std::stringstream ss;
@@ -35,9 +36,10 @@ namespace ace{
         std::map<string,float> pheromones;
     private:
         void selectNode(ant& a,float q0,int beta);
-        void updatePheromones();
+        void updatePheromones(ant& a, float alpha);
         void evaporatePheromones(float alpha, float t0);
         float getpheromones(int nodeA,int nodeB);
+        void addpheromones(int nodeA, int nodeB,float value,float alpha);
         maoa::Graph * g;
     };
 
