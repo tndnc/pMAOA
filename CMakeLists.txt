@@ -5,7 +5,10 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(src lib/lemon/include)
 
-add_executable(aco src/graph.cpp src/graph.h src/gnuplot.h src/bp_heuristic.h src/bp_heuristic.cpp src/aceHeuristics.h src/aceHeuristics.cpp)
+add_executable(aco
+        src/graph.cpp src/graph.h
+        src/gnuplot.h src/bp_heuristic.h src/bp_heuristic.cpp
+        src/ace_heuristic.h src/ace_heuristic.cpp src/ace_main.cpp)
 
 add_executable(cw
         src/graph.cpp
