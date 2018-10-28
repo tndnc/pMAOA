@@ -5,10 +5,10 @@
 
 namespace maoa {
 
-    std::vector<Tour> constructClusters(Graph &g) {
+    std::vector<VTour> constructClusters(Graph &g) {
 
-        std::vector<Tour> clusters;
-        Tour currentCluster;
+        std::vector<VTour> clusters;
+        VTour currentCluster;
         const int nodeNum = g.nodeNum();
         const int depotId = g.depotId();
         int startingPoint;
@@ -63,7 +63,7 @@ namespace maoa {
                 if (it == nodeIds.begin()) {
                     std::cout << "Cluster is full" << std::endl;
                     clusters.push_back(currentCluster);
-                    currentCluster = Tour();
+                    currentCluster = VTour();
                     // Reset iterator to the end of the list
                     startingPoint = (*--nodeIds.end());
                     std::cout << "New starting point: " << startingPoint << std::endl;

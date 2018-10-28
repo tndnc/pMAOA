@@ -41,6 +41,9 @@ namespace maoa {
 		float getDemand(lemon::FullGraph::Node u) const {
 		    return _nodeMap[u].demand;
 		}
+		float getDemand(int i) {
+		    return getDemand(_g(i));
+		}
 		NodeData getData(lemon::FullGraph::Node u) const {
 		    return _nodeMap[u];
 		}
@@ -73,12 +76,12 @@ namespace maoa {
 		}
 	};
 
-	struct Tour {
+	struct VTour {
 	private:
-		std::list<int> cities;
+		std::vector<int> cities;
 	public:
 		float capacity;
-		Tour() : capacity(0) {}
+		VTour() : capacity(0) {}
 		int getCity(unsigned long idx) { return cities.at(idx); }
 		unsigned long size() const { return cities.size(); }
 		void addCity(int nodeId, float c) {

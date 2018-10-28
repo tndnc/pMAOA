@@ -3,15 +3,17 @@
 #include "draw.h"
 
 int main () {
-    maoa::Graph g("../data/A/A-n32-k5.vrp");
+    maoa::Graph g("../data/A/A-n62-k8.vrp");
 //    g.print();
 //    drawGraph(g);
-//    std::vector<maoa::Tour> solution = constructClusters(g);
-
-//    for (auto & c : solution) {
+//    std::vector<maoa::VTour> tours = constructClusters(g);
+//
+//    for (auto & c : tours) {
 //        c.print();
 //    }
-//
-//    drawTours(solution, g);
-    maoa::cw::constructTours(g);
+
+//    drawTours(tours, g);
+    std::list<maoa::cw::Tour> tours = maoa::cw::constructTours(g);
+    std::cout << "Number of routes: " << tours.size() << std::endl;
+    drawTours(tours, g);
 }

@@ -6,7 +6,7 @@
 #define PMAOA_BPHEURISTIC_H
 
 namespace maoa {
-    std::vector<Tour> constructClusters(Graph &g);
+    std::vector<VTour> constructClusters(Graph &g);
 }
 
 #endif //PMAOA_CHEURISTIC_H
