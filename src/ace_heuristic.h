@@ -19,7 +19,6 @@ namespace ace {
         std::list<int>::iterator it;
         float capacity;
         int position;
-        float score;
         float distance;
 
         string to_string() const {
@@ -33,7 +32,7 @@ namespace ace {
     public:
         explicit ace_heutistic(const string &filename);
 
-        void run(int nb_iter, int nb_ants, int beta, float alpha, float q0, float t0);
+        void run(int nb_iter, int nb_ants, float beta, float alpha, float q0, float t0);
 
         std::map<string, float> pheromones;
     private:
@@ -47,6 +46,9 @@ namespace ace {
 
         void addpheromones(int nodeA, int nodeB, float value, float alpha);
 
+        void resetAnts(int nb_ants, ant Ants[]);
+
+        float getRandom();
         maoa::Graph *g;
     };
 }
