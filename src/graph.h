@@ -41,7 +41,7 @@ namespace maoa {
 		float getDemand(lemon::FullGraph::Node u) const {
 		    return _nodeMap[u].demand;
 		}
-		float getDemand(int i) {
+		float getDemand(int i) const {
 		    return getDemand(_g(i));
 		}
 		NodeData getData(lemon::FullGraph::Node u) const {
@@ -67,24 +67,32 @@ namespace maoa {
 		}
 	};
 
-	struct VTour {
-	private:
-		std::vector<int> cities;
-	public:
+	struct Tour {
 		float capacity;
-		VTour() : capacity(0) {}
-		int getCity(unsigned long idx) { return cities.at(idx); }
-		unsigned long size() const { return cities.size(); }
-		void addCity(int nodeId, float c) {
-			cities.push_back(nodeId);
+		std::list<int> cities;
+
+		Tour() : capacity(0) {}
+		void addCity(int i, float c) {
+			cities.push_back(i);
 			capacity += c;
 		}
+		int getFirstCity() const {
+			return *cities.begin();
+		}
+		int getLastCity() const {
+			return *--cities.end();
+		}
 		void print() const {
-			for (int c : cities) {
-				std::cout << c << " ";
+			std::cout << "Capacity: " << capacity << std::endl;
+			std::cout << "0 ";
+			for (int a : cities) {
+				std::cout << a << " ";
 			}
-			std::cout << std::endl << "Capacity: " << capacity << std::endl;
-			std::cout << "Size: " << cities.size() << std::endl;
+			std::cout << "0" << std::endl;
+		}
+		void merge(Tour * t2) {
+			cities.splice(cities.end(), t2->cities);
+			capacity += t2->capacity;
 		}
 	};
 }

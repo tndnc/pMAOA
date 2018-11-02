@@ -17,7 +17,7 @@ Graph::Graph(const string &filename) : _nodeMap(_g) {
     infile.open(filename);
 
     if (!infile) {
-        std::cout << "Unable to open file : " << filename << std::endl;
+        std::cerr << "Unable to open file : " << filename << std::endl;
         exit(1);
     }
 
@@ -86,7 +86,7 @@ Graph::Graph(const string &filename) : _nodeMap(_g) {
 }
 
 void Graph::print() const {
-    int nodeNum = _g.nodeNum();
+    const int nodeNum = _g.nodeNum();
     int i;
     for (i = 0; i < nodeNum; i++) {
         Node u = _g(i);

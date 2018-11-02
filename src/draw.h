@@ -6,8 +6,14 @@
 #ifndef PMAOA_DRAW_H
 #define PMAOA_DRAW_H
 
-void drawGraph(maoa::Graph &g);
-void drawTours(std::vector<maoa::VTour> &tours, maoa::Graph &g);
-void drawTours(std::list<maoa::cw::Tour> &tours, maoa::Graph &g);
+namespace maoa {
+    class DrawUtils {
+    private:
+        gnuplot plot;
+    public:
+        void drawGraph(Graph &g);
+        void drawTours(std::list<Tour> &tours, Graph &g);
+    };
+}
 
 #endif //PMAOA_DRAW_H

@@ -3,8 +3,7 @@
 namespace maoa {
     namespace cw {
 
-        std::list<Tour> constructTours(Graph &g) {
-
+        std::list<Saving> _computeSavings(Graph &g) {
             std::list<Saving> savings;
             double lambda = 1; // TODO: change this parameter
 
@@ -25,6 +24,18 @@ namespace maoa {
             savings.sort([&](Saving &s1, Saving &s2) {
                 return s1.saving > s2.saving;
             });
+
+            return savings;
+        }
+
+        std::list<Tour> constructTours(Graph &g) {
+
+            // TODO: Too many savings computed. Could be reduced to nlogn. The construction then needs to check the
+            // routes beginning-ending by (i,0)-(0,j) and (j,0)-(0,i).
+            std::list<Saving> savings = _computeSavings(g);
+            int nodeNum, i, j;
+            int depotId = g.depotId();
+            nodeNum = g.nodeNum();
 
             // Create n initial routes of the form (depot, i, depot).
             std::list<Tour> routes;
@@ -65,12 +76,7 @@ namespace maoa {
 
                 if (route1 != nullptr && route2 != nullptr && route1 != route2) {
                     if (route1->capacity + route2->capacity <= g.capacity()) {
-                        // Print route1 before
-                        route1->print();
-                        route2->print();
                         route1->merge(route2);
-                        route1->print();
-                        std::cout << std::endl;
 
                         // Delete empty route after merge
                         auto re_it = routes.begin();
