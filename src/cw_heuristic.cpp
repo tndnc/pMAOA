@@ -30,8 +30,6 @@ namespace maoa {
 
         std::list<Tour> constructTours(Graph &g) {
 
-            // TODO: Too many savings computed. Could be reduced to nlogn. The construction then needs to check the
-            // routes beginning-ending by (i,0)-(0,j) and (j,0)-(0,i).
             std::list<Saving> savings = _computeSavings(g);
             int nodeNum, i, j;
             int depotId = g.depotId();
