@@ -3,7 +3,7 @@
 
 int main () {
     ace::ace_heutistic ace("../data/A/A-n32-k5.vrp");
-    ace.run(20,20,2.3,0.1,0.1,0.00001);
+    ace.run(50,100,2.3,0.1,0.1,0.00001);
 //    maoa::Graph g("../data/A/A-n62-k8.vrp");
 //    g.print();
 //    drawGraph(g);

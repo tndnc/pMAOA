@@ -13,7 +13,7 @@ namespace ace {
 
     void ace_heutistic::run(int nb_iter, int nb_ants, float beta, float alpha, float q0, float t0) {
 
-        std::cout<<"Running, graph has "<< g->nodeNum() <<" nodes\n";         //initialization ants
+        //std::cout<<"Running, graph has "<< g->nodeNum() <<" nodes\n";         //initialization ants
 
         ant Ants[nb_ants];
         for (int i = 0; i < nb_ants; i++) {
@@ -21,7 +21,7 @@ namespace ace {
         }
         resetAnts(nb_ants, Ants);
 
-        std::cout<<"Done initializing ants\n";         //initialization pheromones
+        //std::cout<<"Done initializing ants\n";         //initialization pheromones
 
         std::stringstream ss;
         for (int i = 0; i < g->nodeNum(); i++) {
@@ -33,24 +33,45 @@ namespace ace {
             }
         }
 
-        std::cout<<"Done initializing Pheromones\n";         //data for selecting best ant
+        //std::cout<<"Done initializing Pheromones\n";         //data for selecting best ant
 
         //TODO change scoring
         float dst = 10000000000;
         int bestAnt = 0;
-        std::cout << "started Main loop\n";         //main loop
+        std::list<int>::iterator itm;
+        //std::cout << "started Main loop\n";         //main loop
         for (int j = 0; j < nb_iter; j++) {
             for (int i = 0; i < nb_ants; i++) {
-                std::cout << "ant :"<< i <<"{\n";
+                //std::cout << "ant :"<< i <<"{\n";
                 while (Ants[i].visited < g->nodeNum()) {
                     selectNode(Ants[i], q0, beta);
+                }
+                //adding this so that the ant always return to start
+                itm = Ants[i].path.begin();
+                itm = itm++;
+                if(*itm != 0){
+                    Ants[i].distance += g->getDistance(Ants[i].position, g->depotId());
+                    Ants[i].position = g->depotId();
+                    itm = Ants[i].path.begin();
+                    Ants[i].path.insert(itm, 0);
+                }
+                //making the distance longer if you use too many vehicules
+                int cpt = 0;
+                for (itm = Ants[i].path.begin(); itm != Ants[i].path.end(); ++itm) {
+                    if(*itm == 0){
+                        cpt++;
+                    }
+                }
+                if(cpt > g->capacity()+1){
+                    //std::cout << "malus"<< "\n";         //getting the best ant
+                    Ants[i].distance += 100;
                 }
                 if (dst > Ants[i].distance) {
                     bestAnt = Ants[i].id;
                     dst = Ants[i].distance;
                     std::cout << "\n new best ant found ;"<< dst << "\n";         //getting the best ant
                 }
-                std::cout << "}\n";
+                //std::cout << "}\n";
             }
             updatePheromones(Ants[bestAnt], alpha);
             evaporatePheromones(alpha, t0);
@@ -66,7 +87,7 @@ namespace ace {
                 dst = Ants[i].distance;
             }
         }
-        std::cout << "best Ant :"<< Ants[bestAnt].id  << " Distance :" << Ants[bestAnt].distance ;
+        //std::cout << "best Ant :"<< Ants[bestAnt].id  << " Distance :" << Ants[bestAnt].distance ;
     }
 
     void ace_heutistic::selectNode(ant &a, float q0, int beta) {
@@ -90,7 +111,7 @@ namespace ace {
                 }
             }
             if (nextNode == -1) {
-                std::cout << 0 << " ";
+                //std::cout << 0 << " ";
                 a.distance += g->getDistance(a.position, g->depotId());
                 a.position = 0;
                 a.capacity =  100;
@@ -98,7 +119,7 @@ namespace ace {
                 a.path.insert(it, 0);
                 return;
             } else {
-                std::cout << nextNode << " ";
+                //std::cout << nextNode << " ";
                 a.distance += g->getDistance(a.position, g->depotId());
                 a.position = nextNode;
                 it = a.path.begin();
@@ -132,15 +153,24 @@ namespace ace {
                     }
                 }
             }
+            if(proba.empty()){
+                //std::cout << 0 << " ";
+                a.distance += g->getDistance(a.position, g->depotId());
+                a.position = 0;
+                a.capacity =  100;
+                it = a.path.begin();
+                a.path.insert(it, 0);
+                return;
+            }
             std::map<double, int>::iterator itproba;
             float totpop = 0;
             for (itproba = proba.begin(); itproba != proba.end(); ++itproba) {
                 totpop += itproba->first;
                 //std::cout << "aaaa" << " ";
                 if (totpop > rnd) {
-                    std::cout << itproba->second << " ";
+                    //std::cout << itproba->second << " ";
                     a.distance += g->getDistance(a.position, itproba->second);
-                    a.capacity -= g->getData(nextNode).demand;
+                    a.capacity -= g->getData(itproba->second).demand;
                     a.position = itproba->second;
                     it = a.path.begin();
                     a.visited ++;
@@ -153,7 +183,7 @@ namespace ace {
 
 
     void ace_heutistic::updatePheromones(ant &a, float alpha) {
-        std::cout << " updating pheromones \n";
+        //std::cout << " updating pheromones \n";
         //TODO itrttre da,ns lautre sens
         int prevPosition = a.position;
         std::list<int>::iterator it;
@@ -164,14 +194,14 @@ namespace ace {
     }
 
     void ace_heutistic::evaporatePheromones(float alpha, float t0) {
-        std::cout << " evaporate pheromones : ";
+        //std::cout << " evaporate pheromones : ";
         std::map<string, float>::iterator phit;
         for (phit = pheromones.begin(); phit != pheromones.end(); phit++) {
-            std::cout << phit->second *100000<< "|";
+            //std::cout << phit->second *100000<< "|";
             float tmp = (phit->second * (1 - alpha )) + (t0 * alpha);
             phit->second = tmp;
         }
-        std::cout << " -\n";
+        //std::cout << " -\n";
     }
 
     float ace_heutistic::getpheromones(int nodeA, int nodeB) {
