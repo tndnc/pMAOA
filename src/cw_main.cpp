@@ -23,7 +23,7 @@ int main (int argc, char** argv) {
 
     maoa::Graph g(filepath);
 
-    std::list<maoa::Tour> tours = maoa::cw::constructTours(g);
+    std::list<maoa::Tour> tours = maoa::cw::getFeasible(g);
     std::cout << "Number of routes: " << tours.size() << std::endl;
     maoa::idesc::descent(tours, g);
 

@@ -32,11 +32,12 @@ std::vector<std::string> getFileNames(const std::string &dirpath)
 }
 
 int main() {
-    auto filenames = getFileNames("../data/A/");
+    auto filenames = getFileNames("../data/B/");
     for (auto &s : filenames) {
 //        std::cout << "Starting C&W heuristic for: " << s << std::endl;
-        maoa::Graph g("../data/A/" + s);
-        std::list<maoa::Tour> tours = maoa::cw::constructTours(g);
+        maoa::Graph g("../data/B/" + s);
+        std::list<maoa::cw::Saving> savings = maoa::cw::computeSavings(g);
+        std::list<maoa::Tour> tours = maoa::cw::constructTours(g, savings);
 //        std::cout << "Number of routes: " << tours.size() << std::endl;
         if (g.vehiclesNum() < tours.size()) {
             std::cerr << "Too many routes for " << s << " " << g.vehiclesNum() << " != " << tours.size() << std::endl;

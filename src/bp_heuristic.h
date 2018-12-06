@@ -8,6 +8,7 @@
 namespace maoa {
     namespace bp {
         std::list<Tour> constructClusters(Graph &g);
+        std::list<Tour> getFeasible(Graph &g);
     }
 }
 

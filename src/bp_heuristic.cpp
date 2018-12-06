@@ -21,7 +21,6 @@ namespace maoa {
                 startingPoint = dis(gen);
             } while (startingPoint == depotId);
 
-//            std::cout << "Starting point: " << startingPoint << std::endl;
 
             lemon::FullGraph::Node s = g(startingPoint);
             currentCluster.addCity(startingPoint, g.getDemand(s));
@@ -43,13 +42,10 @@ namespace maoa {
                     continue;
                 }
 
-//                std::cout << "Considering node id: " << nodeId << ". Distance to sp = "
-//                          << g.getDistance(nodeId, startingPoint) << std::endl;
                 lemon::FullGraph::Node u = g(nodeId);
                 if (currentCluster.capacity + g.getDemand(u) <= g.capacity()) {
                     // Add city to cluster
                     currentCluster.addCity(nodeId, g.getDemand(u));
-//                    std::cout << "[Node " << nodeId << "] Added to cluster" << std::endl;
                     // Erase city from unvisited cities.
                     nodeIds.erase(it, std::next(it));
                 } else {
@@ -60,12 +56,10 @@ namespace maoa {
                     //
                     // 2. A city could be added but we haven't considered it yet. We simply move the iterator.
                     if (it == nodeIds.begin()) {
-//                        std::cout << "Cluster is full" << std::endl;
                         clusters.push_back(currentCluster);
                         currentCluster = Tour();
                         // Reset iterator to the end of the list
                         startingPoint = (*--nodeIds.end());
-//                        std::cout << "New starting point: " << startingPoint << std::endl;
                         s = g(startingPoint);
                         currentCluster.addCity(startingPoint, g.getDemand(s));
                         nodeIds.erase(--nodeIds.end(), nodeIds.end());
@@ -80,6 +74,18 @@ namespace maoa {
 
             clusters.push_back(currentCluster);
             return clusters;
+        }
+
+        std::list<Tour> getFeasible(Graph &g) {
+            int nbTries = 0;
+            while (true) {
+                nbTries += 1;
+                std::list<Tour> tours = constructClusters(g);
+                if (tours.size() <= g.vehiclesNum()) {
+                    std::cout << "Number of tries before feasible: " << nbTries << std::endl;
+                    return tours;
+                }
+            }
         }
     }
 }

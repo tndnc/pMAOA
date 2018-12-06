@@ -1,9 +1,17 @@
+#include <random>
+#include <numeric>
 #include "cw_heuristic.h"
 
 namespace maoa {
     namespace cw {
 
-        std::list<Saving> _computeSavings(Graph &g) {
+        /*!
+         * Computes the savings list for the graph `g`. For each pair of cities (i,j), the associated saving value is
+         * the gain from including a link (i,j) to a route in a CVRP solution (s_ij = c_i0 + c0j + c_ij).
+         * @param g input graph.
+         * @return the savings list.
+         */
+        std::list<Saving> computeSavings(Graph &g) {
             std::list<Saving> savings;
             double lambda = 1; // TODO: change this parameter
 
@@ -12,7 +20,7 @@ namespace maoa {
             double ci0, c0j, cij;
             nodeNum = g.nodeNum();
             for (i = 0; i < nodeNum; i++) {
-                for (j = 0; j < nodeNum; j++) {
+                for (j = i + 1; j < nodeNum; j++) {
                     if (i == j) continue;
                     if (i == depotId || j == depotId) continue;
                     ci0 = g.getDistance(i, depotId);
@@ -21,17 +29,58 @@ namespace maoa {
                     savings.emplace_back(i, j, ci0 + c0j - (lambda * cij));
                 }
             }
-            savings.sort([&](Saving &s1, Saving &s2) {
-                return s1.saving > s2.saving;
-            });
-
+            savings.sort([&](Saving &s1, Saving &s2) { return s1.saving > s2.saving; });
             return savings;
         }
 
-        std::list<Tour> constructTours(Graph &g) {
+        std::list<Saving> _updateSavings(std::list<Saving> inSavings) {
+            // IN: Must be sorted
 
-            std::list<Saving> savings = _computeSavings(g);
-            int nodeNum, i, j;
+            std::list<Saving> outSavings;
+
+            std::random_device rd;     // only used once to initialise (seed) engine
+            std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+            std::uniform_int_distribution<int> u_int(1,5); // guaranteed unbiased
+            std::uniform_real_distribution<double> u_real;
+
+            while (!inSavings.empty()) {
+                int T = u_int(rng);
+                if (T > inSavings.size()) T = inSavings.size();
+                auto endIter = inSavings.begin();
+                std::advance(endIter, T);
+                double savingSum = std::accumulate(inSavings.begin(), endIter, 0, [&](double lhs, Saving &s) {
+                    return lhs + s.saving;
+                });
+
+                std::vector<double> cumSumVector;
+                cumSumVector.resize(T);
+                auto beginIter = inSavings.begin();
+                double cumSum = 0;
+                for (int i = 0; i < T; i++) {
+                    cumSum += (beginIter->saving / savingSum);;
+                    cumSumVector[i] = cumSum;
+                    beginIter++;
+                }
+
+                double r = u_real(rng);
+                int chosenSavingIdx = 0;
+                while (cumSumVector[chosenSavingIdx] < r) {
+                    chosenSavingIdx++;
+                }
+
+                beginIter = inSavings.begin();
+                std::advance(beginIter, chosenSavingIdx);
+                outSavings.push_back(*beginIter);
+
+                inSavings.erase(beginIter, std::next(beginIter));
+            }
+
+            return outSavings;
+        }
+
+        std::list<Tour> constructTours(Graph &g, std::list<Saving> &savings) {
+
+            int nodeNum, i;
             int depotId = g.depotId();
             nodeNum = g.nodeNum();
 
@@ -87,6 +136,64 @@ namespace maoa {
             }
 
             return routes;
+        }
+
+        /*!
+         * Returns the total distance between a string `t` of cities, with the depot of the graph `g` as starting and
+         * ending point.
+         * @param t list of consecutive cities.
+         * @param g graph containing the cities.
+         * @return the total distance as a double.
+         */
+        double getTotalTourDistance(std::list<int> &t, const Graph &g) {
+            double tourDistance = g.getDistance(g.depotId(), *t.begin());
+            auto c_it = ++t.begin();
+            while (c_it != t.end()) {
+                tourDistance += g.getDistance(*std::prev(c_it), *c_it);
+                c_it++;
+            }
+            tourDistance += g.getDistance(*--c_it, g.depotId());
+            return tourDistance;
+        }
+
+        /*!
+         * Returns the total distance of a solution.
+         * @param tours list of tours
+         * @param g graph containing the tours.
+         * @return the total cost of the solution (sum of tour distances) as a double.
+         */
+        double getTotalCost(std::list<Tour> &tours, const Graph &g) {
+            double totalCost = 0;
+            for (Tour &t : tours) {
+                totalCost += getTotalTourDistance(t.cities, g);
+            }
+            return totalCost;
+        }
+
+        std::list<Tour> getFeasible(Graph &g) {
+            int nbTries = 0;
+            double bestCost = INFINITY;
+            std::list<Saving> savings = computeSavings(g);
+            std::list<Saving> bestSavings;
+
+            while (nbTries < 1000) {
+                nbTries += 1;
+                std::list<Tour> tours = constructTours(g, savings);
+                if (tours.size() <= g.vehiclesNum()) {
+                    std::cout << "Number of tries before feasible: " << nbTries << std::endl;
+                    std::cout << "Best cost: " << bestCost << std::endl;
+                    return tours;
+                }
+                double totalCost = getTotalCost(tours, g);
+                if (totalCost < bestCost) {
+                    bestCost = totalCost;
+                    bestSavings = savings;
+                    std::cout << "Improvement: " << bestCost << std::endl;
+                }
+                savings = _updateSavings(bestSavings);
+            }
+
+            std::cout << "1000 iterations and no feasible solution" << std::endl;
         }
     }
 }

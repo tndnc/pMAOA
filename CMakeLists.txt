@@ -20,4 +20,4 @@ add_executable(cw_test src/tests/cw_test.cpp src/graph.h src/graph.cpp src/cw_he
 add_executable(bp
         src/graph.cpp
         src/graph.h src/gnuplot.h src/bp_heuristic.h src/bp_heuristic.cpp
-        src/draw.h src/draw.cpp src/gnuplot.cpp src/cw_heuristic.h src/cw_heuristic.cpp src/bp_main.cpp src/iterative_descent.h src/iterative_descent.cpp)
+        src/draw.h src/draw.cpp src/gnuplot.cpp src/bp_main.cpp src/iterative_descent.h src/iterative_descent.cpp)

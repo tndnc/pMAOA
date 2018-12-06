@@ -37,8 +37,8 @@ namespace maoa {
 
         /*!
          * Improves a list of tours by exploring the 2-opt neighborhood of each tour. For each tour, the arcs between
-         * four cities are deleted and the cities are reconnected so as to construct a new different tour. If the new
-         * tour has a total distance inferior to the orginal, the new tour is kept.
+         * four cities are deleted and the cities are reconnected to construct a new and different tour. If the new
+         * tour has a total distance inferior to the original, the new tour is kept.
          * @param tours list of tours to improve.
          * @param g graph containing the tours.
          * @return a boolean indicating if a change was made to any of the tours.
@@ -178,19 +178,77 @@ namespace maoa {
             bool changeMade = false;
             std::list<Tour>::iterator t_it1, t_it2;
 
+            begin:
             // Check all pairs of tours.
             for (t_it1 = tours.begin(); t_it1 != --tours.end(); t_it1++) {
                 for (t_it2 = std::next(t_it1); t_it2 != tours.end(); t_it2++) {
+
+                    // Check all pairs of cities within the tours.
+                    auto c_it1 = t_it1->cities.begin();
+                    while (c_it1 != t_it1->cities.end()) {
+                        int currentT1 = *c_it1;
+                        float demandT1 = g.getDemand(currentT1);
+
+                        // If c_it1 is first node in tour, then previous node is depot.
+                        int prevT1 = (c_it1 == t_it1->cities.begin()) ? g.depotId() : *std::prev(c_it1);
+                        // If c_it1 is last node in tour, then next node is depot.
+                        int nextT1 = (c_it1 == --t_it1->cities.end()) ? g.depotId() : *std::next(c_it1);
+
+                        double distanceT1 = g.getDistance(prevT1, currentT1) + g.getDistance(currentT1, nextT1);
+
+                        auto c_it2 = t_it2->cities.begin();
+                        while (c_it2 != t_it2->cities.end()) {
+                            int currentT2 = *c_it2;
+                            float demandT2 = g.getDemand(currentT2);
+
+                            // Check that c1 can be exchanged with c2.
+                            if (t_it2->capacity -demandT2 +demandT1 > g.capacity()
+                                    || t_it1->capacity -demandT1 +demandT2 > g.capacity()) {
+                                c_it2++;
+                                continue;
+                            }
+
+                            // If c_it1 is first node in tour, then previous node is depot.
+                            int prevT2 = (c_it2 == t_it2->cities.begin()) ? g.depotId() : *std::prev(c_it2);
+                            // If c_it1 is last node in tour, then next node is depot.
+                            int nextT2 = (c_it2 == --t_it2->cities.end()) ? g.depotId() : *std::next(c_it2);
+
+                            // Compute distance of current tour
+                            double currentDistance = distanceT1 + g.getDistance(prevT2, currentT2)
+                                                     + g.getDistance(currentT2, nextT2);
+
+                            double distanceIfExchange = g.getDistance(prevT1, currentT2)
+                                                        + g.getDistance(currentT2, nextT1)
+                                                        + g.getDistance(prevT2, currentT1)
+                                                        + g.getDistance(currentT1, nextT2);
+
+                            if (distanceIfExchange < currentDistance) {
+                                // Implement changes
+                                t_it1->cities.insert(c_it1, currentT2);
+                                t_it2->cities.insert(c_it2, currentT1);
+                                t_it1->cities.erase(c_it1);
+                                t_it2->cities.erase(c_it2);
+                                t_it1->capacity += demandT2 -demandT1;
+                                t_it2->capacity += demandT1 -demandT2;
+                                changeMade = true;
+                                // Reset search.
+                                goto begin;
+                            }
+
+                            c_it2++;
+                        }
+
+                        c_it1++;
+                    }
                 }
             }
-
             return changeMade;
         }
 
         /*!
-         * Performs an iterative improvement procedure. The tours are improved with several procedure in the following
+         * Performs an iterative improvement procedure. The tours are improved with several procedures in the following
          * order: 2-opt neighborhood, relocating of one city, exchange of city. The process is retried as long as one
-         * of the procedure is successful in improving the solution cost.
+         * of the procedures is successful in improving the solution cost.
          * @param tours list of tours to improve.
          * @param g graph containing the tours.
          */

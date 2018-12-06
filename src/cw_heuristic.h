@@ -11,7 +11,9 @@ namespace maoa {
             double saving;
         };
 
-        std::list<Tour> constructTours(Graph & g);
+        std::list<Saving> computeSavings(Graph &g);
+        std::list<Tour> constructTours(Graph & g, std::list<Saving> &savings);
+        std::list<Tour> getFeasible(Graph &g);
     }
 }
 

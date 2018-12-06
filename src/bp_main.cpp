@@ -28,13 +28,13 @@ int main(int argc, char** argv) {
 
     maoa::Graph g(filepath);
 
-    std::list<maoa::Tour> tours = maoa::bp::constructClusters(g);
+    std::list<maoa::Tour> tours = maoa::bp::getFeasible(g);
     std::cout << "Number of tours constructed: " << tours.size() << std::endl;
-    if (tours.size() >= 10) {
-        for (maoa::Tour &t : tours) {
-            t.print();
-        }
-    }
+//    if (tours.size() >= 10) {
+//        for (maoa::Tour &t : tours) {
+//            t.print();
+//        }
+//    }
 
     if (drawSolutionBefore) {
         maoa::DrawUtils drawUtils;
@@ -43,11 +43,11 @@ int main(int argc, char** argv) {
 
     maoa::idesc::descent(tours, g);
 
-    if (tours.size() >= 10) {
-        for (maoa::Tour &t : tours) {
-            t.print();
-        }
-    }
+//    if (tours.size() >= 10) {
+//        for (maoa::Tour &t : tours) {
+//            t.print();
+//        }
+//    }
 
     if (drawSolutionAfter) {
         maoa::DrawUtils drawUtils;
