@@ -36,7 +36,7 @@ namespace ace {
 
         //std::cout<<"Done initializing Pheromones\n";         //data for selecting best ant
 
-        float dst = std::numeric_limits<float >::max();
+        float dst = std::numeric_limits<float>::max();
         int bestAnt = 0;
         std::list<int> bestPath;
 
@@ -62,15 +62,15 @@ namespace ace {
                         cpt++;
                     }
                 }
-                if(cpt > g->capacity()+1){
+                if(cpt > g->vehiclesNum()+1){
                     //std::cout << "malus"<< "\n";
-                    Ants[i].distance += 1000;
+                    Ants[i].distance = std::numeric_limits<float>::max();;
                 }
                 if (dst > Ants[i].distance) {
                     bestAnt = Ants[i].id;
                     bestPath = Ants[i].path;
                     dst = Ants[i].distance;
-                    std::cout << "\n new best ant found ;"<< dst << "\n";         //getting the best ant
+                    //std::cout << "\n new best ant found ;"<< dst << "\n";         //getting the best ant
                 }
             }
             updatePheromones(Ants[bestAnt], alpha);
