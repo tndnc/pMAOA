@@ -1,9 +1,22 @@
+#include "graph.h"
 #include "ace_heuristic.h"
 #include "draw.h"
+#include "iterative_descent.h"
 
-int main () {
+int main(int argc, char** argv) {
+    maoa::Graph g("../data/A/A-n32-k5.vrp");
+    maoa::DrawUtils drawUtils;
+    drawUtils.drawGraph(g);
     ace::ace_heutistic ace("../data/A/A-n32-k5.vrp");
-    ace.run(50,100,2.3,0.1,0.1,0.00001);
+    std::list<maoa::Tour> tours = ace.run(50,100,2.3,0.1,0.2,0.00001);
+    for (auto & c : tours) {
+       c.print();
+    }
+
+    drawUtils.drawTours(tours, g);
+    maoa::idesc::descent(tours, g);
+    drawUtils.drawTours(tours, g);
+
 //    maoa::Graph g("../data/A/A-n62-k8.vrp");
 //    g.print();
 //    drawGraph(g);

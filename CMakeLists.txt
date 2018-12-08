@@ -7,8 +7,8 @@ include_directories(src lib/lemon/include)
 
 add_executable(aco
         src/graph.cpp src/graph.h
-        src/gnuplot.h src/bp_heuristic.h src/bp_heuristic.cpp
-        src/ace_heuristic.h src/ace_heuristic.cpp src/ace_main.cpp)
+        src/gnuplot.h src/bp_heuristic.h src/bp_heuristic.cpp src/iterative_descent.h src/iterative_descent.cpp
+        src/ace_heuristic.h src/ace_heuristic.cpp src/ace_main.cpp src/draw.h src/draw.cpp src/gnuplot.cpp)
 
 add_executable(cw
         src/graph.cpp

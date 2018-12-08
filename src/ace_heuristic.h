@@ -32,7 +32,7 @@ namespace ace {
     public:
         explicit ace_heutistic(const string &filename);
 
-        void run(int nb_iter, int nb_ants, float beta, float alpha, float q0, float t0);
+        std::list<maoa::Tour> run(int nb_iter, int nb_ants, float beta, float alpha, float q0, float t0);
 
         std::map<string, float> pheromones;
     private:
@@ -49,6 +49,7 @@ namespace ace {
         void resetAnts(int nb_ants, ant Ants[]);
 
         float getRandom();
+
         maoa::Graph *g;
     };
 }

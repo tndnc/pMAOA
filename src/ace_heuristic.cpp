@@ -4,6 +4,7 @@
 
 #include "graph.h"
 #include "ace_heuristic.h"
+#include "limits"
 
 namespace ace {
 
@@ -11,7 +12,7 @@ namespace ace {
         g = new maoa::Graph(filename);
     }
 
-    void ace_heutistic::run(int nb_iter, int nb_ants, float beta, float alpha, float q0, float t0) {
+    std::list<maoa::Tour> ace_heutistic::run(int nb_iter, int nb_ants, float beta, float alpha, float q0, float t0) {
 
         //std::cout<<"Running, graph has "<< g->nodeNum() <<" nodes\n";         //initialization ants
 
@@ -35,14 +36,13 @@ namespace ace {
 
         //std::cout<<"Done initializing Pheromones\n";         //data for selecting best ant
 
-        //TODO change scoring
-        float dst = 10000000000;
+        float dst = std::numeric_limits<float >::max();
         int bestAnt = 0;
+        std::list<int> bestPath;
+
         std::list<int>::iterator itm;
-        //std::cout << "started Main loop\n";         //main loop
         for (int j = 0; j < nb_iter; j++) {
             for (int i = 0; i < nb_ants; i++) {
-                //std::cout << "ant :"<< i <<"{\n";
                 while (Ants[i].visited < g->nodeNum()) {
                     selectNode(Ants[i], q0, beta);
                 }
@@ -63,15 +63,15 @@ namespace ace {
                     }
                 }
                 if(cpt > g->capacity()+1){
-                    //std::cout << "malus"<< "\n";         //getting the best ant
-                    Ants[i].distance += 100;
+                    //std::cout << "malus"<< "\n";
+                    Ants[i].distance += 1000;
                 }
                 if (dst > Ants[i].distance) {
                     bestAnt = Ants[i].id;
+                    bestPath = Ants[i].path;
                     dst = Ants[i].distance;
                     std::cout << "\n new best ant found ;"<< dst << "\n";         //getting the best ant
                 }
-                //std::cout << "}\n";
             }
             updatePheromones(Ants[bestAnt], alpha);
             evaporatePheromones(alpha, t0);
@@ -80,18 +80,26 @@ namespace ace {
                 resetAnts(nb_ants,Ants);
             }
         }
-        dst=10000000000;
-        for(int i = 0; i < nb_ants; i++) {
-            if (dst > Ants[i].distance) {
-                bestAnt = Ants[i].id;
-                dst = Ants[i].distance;
+
+        std::cout << "best Ant :"<< Ants[bestAnt].id  << " Distance :" << dst << "\n";
+
+        std::list<maoa::Tour> clusters;
+        maoa::Tour currentCluster;
+        const int depotId = g->depotId();
+        std::list<int>::iterator itbp;
+        for(itbp = ++bestPath.begin(); itbp != bestPath.end(); itbp ++){
+            if(*itbp == 0){
+                clusters.push_back(currentCluster);
+                currentCluster = maoa::Tour();
+            }else{
+                currentCluster.addCity(*itbp, g->getDemand(*itbp));
             }
         }
-        //std::cout << "best Ant :"<< Ants[bestAnt].id  << " Distance :" << Ants[bestAnt].distance ;
+        return clusters;
+
     }
 
     void ace_heutistic::selectNode(ant &a, float q0, int beta) {
-        //TODO add negative score if too many vehicles
         float q =  getRandom();
         std::list<int>::iterator ita;
         std::list<int>::iterator it;
@@ -129,7 +137,6 @@ namespace ace {
                 return;
             }
         } else {
-            //TODO turn it into probability
             // first loop calculating the sum of all paths
             float sumPaths = 0;
             for (int i = 0; i != g->nodeNum(); i++) {
@@ -166,9 +173,7 @@ namespace ace {
             float totpop = 0;
             for (itproba = proba.begin(); itproba != proba.end(); ++itproba) {
                 totpop += itproba->first;
-                //std::cout << "aaaa" << " ";
                 if (totpop > rnd) {
-                    //std::cout << itproba->second << " ";
                     a.distance += g->getDistance(a.position, itproba->second);
                     a.capacity -= g->getData(itproba->second).demand;
                     a.position = itproba->second;
@@ -246,13 +251,13 @@ namespace ace {
             Ants[i].it = Ants[i].path.begin();
             Ants[i].path.insert(Ants[i].it, Ants[i].position);
             Ants[i].distance = 0;
-            //TODO no need for two variables just distance
         }
     }
 
     float ace_heutistic::getRandom() {
-        static std::default_random_engine e;
-        static std::uniform_real_distribution<> dis(0,1);
-        return dis(e);
+        std::random_device rd;
+        std::mt19937 e2(rd());
+        std::uniform_real_distribution<> dist(0,1);
+        return dist(e2);
     }
 }
