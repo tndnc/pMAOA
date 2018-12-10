@@ -1,23 +1,58 @@
 cmake_minimum_required(VERSION 3.10)
 project(pmaoa)
-
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+set(Qt5_DIR "/Applications/Qt/5.12.0/clang_64/lib/cmake/Qt5")
 
-include_directories(src lib/lemon/include)
+# Find libraries
+find_package(CPLEX)
+find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+find_package(LEMON)
 
-add_executable(aco
-        src/graph.cpp src/graph.h
-        src/gnuplot.h src/bp_heuristic.h src/bp_heuristic.cpp src/iterative_descent.h src/iterative_descent.cpp
-        src/ace_heuristic.h src/ace_heuristic.cpp src/ace_main.cpp src/draw.h src/draw.cpp src/gnuplot.cpp)
+# Set source files
+set(DRAW_SRC src/gnuplot.h src/gnuplot.cpp src/draw.h src/draw.cpp)
+set(GRAPH_SRC src/graph.h src/graph.cpp)
+set(IDESC_SRC src/iterative_descent.h src/iterative_descent.cpp)
 
-add_executable(cw
-        src/graph.cpp
-        src/graph.h src/gnuplot.h
-        src/draw.h src/draw.cpp src/cw_main.cpp src/gnuplot.cpp src/cw_heuristic.h src/cw_heuristic.cpp src/iterative_descent.h src/iterative_descent.cpp)
 
-add_executable(cw_test src/tests/cw_test.cpp src/graph.h src/graph.cpp src/cw_heuristic.cpp src/cw_heuristic.h)
+#add_executable(aco
+#        src/graph.cpp src/graph.h
+#        src/gnuplot.h src/bp_heuristic.h src/bp_heuristic.cpp src/iterative_descent.h src/iterative_descent.cpp
+#        src/ace_heuristic.h src/ace_heuristic.cpp src/ace_main.cpp src/draw.h src/draw.cpp src/gnuplot.cpp)
 
-add_executable(bp
-        src/graph.cpp
-        src/graph.h src/gnuplot.h src/bp_heuristic.h src/bp_heuristic.cpp
-        src/draw.h src/draw.cpp src/gnuplot.cpp src/bp_main.cpp src/iterative_descent.h src/iterative_descent.cpp)
+# ----------------------------------------------------------------------------
+# Clark & Wright heuristic
+#
+add_executable(cw ${GRAPH_SRC} ${DRAW_SRC} ${IDESC_SRC}
+        src/cw_heuristic.h src/cw_heuristic.cpp src/cw_main.cpp)
+target_link_libraries(cw lemon-library)
+#
+# ----------------------------------------------------------------------------
+
+add_executable(cw_test
+        src/tests/cw_test.cpp
+        ${GRAPH_SRC} ${IDESC_SRC}
+        src/cw_heuristic.cpp src/cw_heuristic.h)
+target_link_libraries(cw_test lemon-library)
+# ----------------------------------------------------------------------------
+# CPLEX VRP Solve
+#
+add_executable(bp ${DRAW_SRC} ${GRAPH_SRC} ${IDESC_SRC}
+        src/bp_heuristic.h src/bp_heuristic.cpp src/bp_main.cpp)
+target_link_libraries(bp lemon-library)
+#
+# ----------------------------------------------------------------------------
+#add_executable(bp ${DRAW_SRC} ${GRAPH_SRC} ${IDESC_SRC}
+#        src/bp_heuristic.h src/bp_heuristic.cpp
+#        src/bp_main.cpp)
+
+# ----------------------------------------------------------------------------
+# CPLEX VRP Solve
+#
+add_executable(cplex_solve src/cplex_solve.cpp ${GRAPH_SRC})
+target_link_libraries(cplex_solve cplex-library cplex-concert ilocplex
+        pthread m lemon-library)
+target_compile_options(cplex_solve PRIVATE -m64 -O -fPIC -fno-strict-aliasing
+        -fexceptions)
+#
+# ----------------------------------------------------------------------------

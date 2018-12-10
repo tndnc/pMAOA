@@ -20,7 +20,8 @@ namespace maoa {
             double ci0, c0j, cij;
             nodeNum = g.nodeNum();
             for (i = 0; i < nodeNum; i++) {
-                for (j = i + 1; j < nodeNum; j++) {
+                // TODO: change j to i + 1
+                for (j = 0; j < nodeNum; j++) {
                     if (i == j) continue;
                     if (i == depotId || j == depotId) continue;
                     ci0 = g.getDistance(i, depotId);
