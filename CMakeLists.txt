@@ -14,11 +14,16 @@ set(DRAW_SRC src/gnuplot.h src/gnuplot.cpp src/draw.h src/draw.cpp)
 set(GRAPH_SRC src/graph.h src/graph.cpp)
 set(IDESC_SRC src/iterative_descent.h src/iterative_descent.cpp)
 
-
-#add_executable(aco
-#        src/graph.cpp src/graph.h
-#        src/gnuplot.h src/bp_heuristic.h src/bp_heuristic.cpp src/iterative_descent.h src/iterative_descent.cpp
-#        src/ace_heuristic.h src/ace_heuristic.cpp src/ace_main.cpp src/draw.h src/draw.cpp src/gnuplot.cpp)
+# ----------------------------------------------------------------------------
+# ACO heuristic
+#
+add_executable(aco ${GRAPH_SRC} ${DRAW_SRC} ${IDESC_SRC}
+        src/aco_heuristic.h src/aco_heuristic.cpp src/aco_main.cpp)
+target_link_libraries(aco lemon-library)
+# --
+add_executable(aco_test src/tests/aco_test.cpp
+        ${GRAPH_SRC} src/aco_heuristic.cpp src/aco_heuristic.h ${IDESC_SRC})
+target_link_libraries(aco_test lemon-library)
 
 # ----------------------------------------------------------------------------
 # Clark & Wright heuristic
@@ -26,25 +31,18 @@ set(IDESC_SRC src/iterative_descent.h src/iterative_descent.cpp)
 add_executable(cw ${GRAPH_SRC} ${DRAW_SRC} ${IDESC_SRC}
         src/cw_heuristic.h src/cw_heuristic.cpp src/cw_main.cpp)
 target_link_libraries(cw lemon-library)
-#
-# ----------------------------------------------------------------------------
-
-add_executable(cw_test
-        src/tests/cw_test.cpp
-        ${GRAPH_SRC} ${IDESC_SRC}
-        src/cw_heuristic.cpp src/cw_heuristic.h)
+# --
+add_executable(cw_test ${GRAPH_SRC} ${IDESC_SRC}
+        src/tests/cw_test.cpp src/cw_heuristic.cpp src/cw_heuristic.h)
 target_link_libraries(cw_test lemon-library)
+
 # ----------------------------------------------------------------------------
-# CPLEX VRP Solve
+# BP heuristic
 #
 add_executable(bp ${DRAW_SRC} ${GRAPH_SRC} ${IDESC_SRC}
         src/bp_heuristic.h src/bp_heuristic.cpp src/bp_main.cpp)
 target_link_libraries(bp lemon-library)
-#
-# ----------------------------------------------------------------------------
-#add_executable(bp ${DRAW_SRC} ${GRAPH_SRC} ${IDESC_SRC}
-#        src/bp_heuristic.h src/bp_heuristic.cpp
-#        src/bp_main.cpp)
+# --
 
 # ----------------------------------------------------------------------------
 # CPLEX VRP Solve
@@ -54,5 +52,3 @@ target_link_libraries(cplex_solve cplex-library cplex-concert ilocplex
         pthread m lemon-library)
 target_compile_options(cplex_solve PRIVATE -m64 -O -fPIC -fno-strict-aliasing
         -fexceptions)
-#
-# ----------------------------------------------------------------------------

@@ -3,16 +3,16 @@
 #include <random>
 
 #include "graph.h"
-#include "ace_heuristic.h"
+#include "aco_heuristic.h"
 #include "limits"
 
 namespace ace {
 
-    ace_heutistic::ace_heutistic(const string &filename) {
+    aco_heuristic::aco_heuristic(const string &filename) {
         g = new maoa::Graph(filename);
     }
 
-    std::list<maoa::Tour> ace_heutistic::run(int nb_iter, int nb_ants, float beta, float alpha, float q0, float t0) {
+    std::list<maoa::Tour> aco_heuristic::run(int nb_iter, int nb_ants, float beta, float alpha, float q0, float t0) {
 
         //std::cout<<"Running, graph has "<< g->nodeNum() <<" nodes\n";         //initialization ants
 
@@ -36,7 +36,7 @@ namespace ace {
 
         //std::cout<<"Done initializing Pheromones\n";         //data for selecting best ant
 
-        float dst = std::numeric_limits<float >::max();
+        float dst = std::numeric_limits<float>::max();
         int bestAnt = 0;
         std::list<int> bestPath;
 
@@ -62,15 +62,15 @@ namespace ace {
                         cpt++;
                     }
                 }
-                if(cpt > g->capacity()+1){
+                if(cpt > g->vehiclesNum()+1){
                     //std::cout << "malus"<< "\n";
-                    Ants[i].distance += 1000;
+                    Ants[i].distance = std::numeric_limits<float>::max();;
                 }
                 if (dst > Ants[i].distance) {
                     bestAnt = Ants[i].id;
                     bestPath = Ants[i].path;
                     dst = Ants[i].distance;
-                    std::cout << "\n new best ant found ;"<< dst << "\n";         //getting the best ant
+                    //std::cout << "\n new best ant found ;"<< dst << "\n";         //getting the best ant
                 }
             }
             updatePheromones(Ants[bestAnt], alpha);
@@ -99,7 +99,7 @@ namespace ace {
 
     }
 
-    void ace_heutistic::selectNode(ant &a, float q0, int beta) {
+    void aco_heuristic::selectNode(ant &a, float q0, int beta) {
         float q =  getRandom();
         std::list<int>::iterator ita;
         std::list<int>::iterator it;
@@ -187,7 +187,7 @@ namespace ace {
     }
 
 
-    void ace_heutistic::updatePheromones(ant &a, float alpha) {
+    void aco_heuristic::updatePheromones(ant &a, float alpha) {
         //std::cout << " updating pheromones \n";
         //TODO itrttre da,ns lautre sens
         int prevPosition = a.position;
@@ -198,7 +198,7 @@ namespace ace {
         }
     }
 
-    void ace_heutistic::evaporatePheromones(float alpha, float t0) {
+    void aco_heuristic::evaporatePheromones(float alpha, float t0) {
         //std::cout << " evaporate pheromones : ";
         std::map<string, float>::iterator phit;
         for (phit = pheromones.begin(); phit != pheromones.end(); phit++) {
@@ -209,7 +209,7 @@ namespace ace {
         //std::cout << " -\n";
     }
 
-    float ace_heutistic::getpheromones(int nodeA, int nodeB) {
+    float aco_heuristic::getpheromones(int nodeA, int nodeB) {
         std::stringstream ss;
         ss << nodeA << nodeB;
         std::map<string, float>::iterator it;
@@ -225,7 +225,7 @@ namespace ace {
         }
     }
 
-    void ace_heutistic::addpheromones(int nodeA, int nodeB, float value, float alpha) {
+    void aco_heuristic::addpheromones(int nodeA, int nodeB, float value, float alpha) {
         std::stringstream ss;
         ss << nodeA << nodeB;
         std::map<string, float>::iterator it;
@@ -242,7 +242,7 @@ namespace ace {
         }
     }
 
-    void ace_heutistic::resetAnts(int nb_ants, ant Ants[]) {
+    void aco_heuristic::resetAnts(int nb_ants, ant Ants[]) {
         for (int i = 0; i < nb_ants; i++) {
             Ants[i].position = g->depotId();
             Ants[i].capacity = g->capacity();
@@ -254,7 +254,7 @@ namespace ace {
         }
     }
 
-    float ace_heutistic::getRandom() {
+    float aco_heuristic::getRandom() {
         std::random_device rd;
         std::mt19937 e2(rd());
         std::uniform_real_distribution<> dist(0,1);
