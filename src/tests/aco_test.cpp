@@ -38,7 +38,7 @@ int main() {
     for (auto &s : filenames) {
         std::cout << "Starting ace heuristic for: " << s << std::endl;
         maoa::Graph g("../data/B/" + s);
-        ace::aco_heuristic ace("../data/A/" + s);
+        ace::aco_heuristic ace("../data/B/" + s);
         std::list<maoa::Tour> tours = ace.run(20,20,2.3,0.1,0.2,0.00001);
 //        std::cout << "Number of routes: " << tours.size() << std::endl;
         if (g.vehiclesNum() < tours.size()) {

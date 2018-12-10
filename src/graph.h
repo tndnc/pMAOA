@@ -34,6 +34,7 @@ namespace maoa {
 		int vehiclesNum() const { return _vehicles;	}
 		float capacity() const { return _Q; }
 		int nodeNum() const { return _g.nodeNum(); }
+		int edgeNum() const { return _g.edgeNum(); }
 		int depotId() const { return _depotId; }
 		lemon::FullGraph::Node operator()(int nodeId) const {
 		    return _g(nodeId);

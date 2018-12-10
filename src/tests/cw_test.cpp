@@ -4,8 +4,9 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
-#include <iterative_descent.h>
-#include <draw.h>
+#include "../iterative_descent.h"
+#include "../draw.h"
+#include "../cw_heuristic.h"
 
 std::vector<std::string> getFileNames(const std::string &dirpath)
 {
@@ -32,10 +33,10 @@ std::vector<std::string> getFileNames(const std::string &dirpath)
 }
 
 int main() {
-    auto filenames = getFileNames("../data/B/");
+    auto filenames = getFileNames("../data/A/");
     for (auto &s : filenames) {
 //        std::cout << "Starting C&W heuristic for: " << s << std::endl;
-        maoa::Graph g("../data/B/" + s);
+        maoa::Graph g("../data/A/" + s);
         std::list<maoa::cw::Saving> savings = maoa::cw::computeSavings(g);
         std::list<maoa::Tour> tours = maoa::cw::constructTours(g, savings);
 //        std::cout << "Number of routes: " << tours.size() << std::endl;

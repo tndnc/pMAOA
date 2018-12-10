@@ -28,9 +28,9 @@ namespace ace {
         };
     };
 
-    class ace_heutistic {
+    class aco_heuristic {
     public:
-        explicit ace_heutistic(const string &filename);
+        explicit aco_heuristic(const string &filename);
 
         std::list<maoa::Tour> run(int nb_iter, int nb_ants, float beta, float alpha, float q0, float t0);
 
