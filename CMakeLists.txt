@@ -47,7 +47,8 @@ target_link_libraries(bp lemon-library)
 # ----------------------------------------------------------------------------
 # CPLEX VRP Solve
 #
-add_executable(cplex_solve src/cplex_solve.cpp ${GRAPH_SRC})
+add_executable(cplex_solve src/cplex_solve/cs_main.cpp ${GRAPH_SRC} src/gnuplot.cpp src/gnuplot.h
+        src/cplex_solve/cs_cut.cpp src/cplex_solve/cs_cut.h)
 target_link_libraries(cplex_solve cplex-library cplex-concert ilocplex
         pthread m lemon-library)
 target_compile_options(cplex_solve PRIVATE -m64 -O -fPIC -fno-strict-aliasing

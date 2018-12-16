@@ -18,7 +18,7 @@ namespace maoa {
 		}
 	};
 
-	class Graph {
+	class Graph : public lemon::FullGraph{
 	public:
         explicit Graph(const string & filename);
 
@@ -28,36 +28,27 @@ namespace maoa {
             return _eucDist(d1, d2);
         }
         double getDistance(int n1, int n2) const {
-            return getDistance(_g(n1), _g(n2));
+            return getDistance(this->operator()(n1), this->operator()(n2));
 		}
         void print() const;
 		int vehiclesNum() const { return _vehicles;	}
 		float capacity() const { return _Q; }
-		int nodeNum() const { return _g.nodeNum(); }
-		int edgeNum() const { return _g.edgeNum(); }
 		int depotId() const { return _depotId; }
-		lemon::FullGraph::Node operator()(int nodeId) const {
-		    return _g(nodeId);
-		}
 		float getDemand(lemon::FullGraph::Node u) const {
 		    return _nodeMap[u].demand;
 		}
 		float getDemand(int i) const {
-		    return getDemand(_g(i));
+		    return getDemand(this->operator()(i));
 		}
 		NodeData getData(lemon::FullGraph::Node u) const {
 		    return _nodeMap[u];
 		}
 		NodeData getData(int nodeId) const {
-		    lemon::FullGraph::Node u = _g(nodeId);
+		    lemon::FullGraph::Node u = this->operator()(nodeId);
 		    return getData(u);
 		}
-		int arcNum() const {
-			return _g.arcNum();
-		};
 
 	private:
-		lemon::FullGraph _g;
 		lemon::FullGraph::NodeMap<NodeData> _nodeMap;
 		int _depotId;
 		float _Q;

@@ -11,7 +11,7 @@ using namespace maoa;
 using Node = lemon::FullGraph::Node;
 using NodeMap = lemon::FullGraph::NodeMap<NodeData>;
 
-Graph::Graph(const string &filename) : _nodeMap(_g) {
+Graph::Graph(const string &filename) : _nodeMap(*this) {
 
     std::ifstream infile;
     infile.open(filename);
@@ -59,22 +59,23 @@ Graph::Graph(const string &filename) : _nodeMap(_g) {
                 i++;
             }
             if (data[0] == "DIMENSION") {
-                _g.resize(stoi(data[2]));
+                this->resize(stoi(data[2]));
                 continue;
             }
             if (data[0] == "CAPACITY") {
                 _Q = stof(data[2]);
+                std::cout << _Q << std::endl;
                 continue;
             }
             if (readingCoord) {
                 // Add Node to graph.
                 int nodeIndex = stoi(data[0]) - 1;
-                Node u = _g(nodeIndex);
+                Node u = this->operator()(nodeIndex);
                 _nodeMap[u].x = stof(data[1]);
                 _nodeMap[u].y = stof(data[2]);
             }
             else if (readingDemand) {
-                Node u = _g(stoi(data[0]) - 1);
+                Node u = this->operator()(stoi(data[0]) - 1);
                 _nodeMap[u].demand = stof(data[1]);
             }
             else if (readingDepot) {
@@ -86,10 +87,10 @@ Graph::Graph(const string &filename) : _nodeMap(_g) {
 }
 
 void Graph::print() const {
-    const int nodeNum = _g.nodeNum();
+    const int nodeNum = this->nodeNum();
     int i;
     for (i = 0; i < nodeNum; i++) {
-        Node u = _g(i);
+        Node u = this->operator()(i);
         std::cout << _nodeMap[u].to_string() << std::endl;
     }
     std::cout << "Depot: " << depotId() << std::endl;
