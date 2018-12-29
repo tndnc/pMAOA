@@ -45,7 +45,6 @@ Graph::Graph(const string &filename) : _nodeMap(*this) {
             std::regex r ("[[:digit:]]+");
             std::smatch s;
             std::regex_search(line,s,r);
-            std::cout << "Vehicles "<< s[0] << "\n";
             _vehicles = stoi(s[0]);
 
         }
@@ -64,7 +63,6 @@ Graph::Graph(const string &filename) : _nodeMap(*this) {
             }
             if (data[0] == "CAPACITY") {
                 _Q = stof(data[2]);
-                std::cout << _Q << std::endl;
                 continue;
             }
             if (readingCoord) {

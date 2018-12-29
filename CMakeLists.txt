@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(pmaoa)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 set(Qt5_DIR "/Applications/Qt/5.12.0/clang_64/lib/cmake/Qt5")
 
@@ -48,7 +48,8 @@ target_link_libraries(bp lemon-library)
 # CPLEX VRP Solve
 #
 add_executable(cplex_solve src/cplex_solve/cs_main.cpp ${GRAPH_SRC} src/gnuplot.cpp src/gnuplot.h
-        src/cplex_solve/cs_cut.cpp src/cplex_solve/cs_cut.h)
+        ${IDESC_SRC} src/cw_heuristic.h src/cw_heuristic.cpp
+        src/cplex_solve/vrpmodel.cpp src/cplex_solve/vrpmodel.h src/cplex_solve/unionfind.h src/cplex_solve/dfs_cycle.h)
 target_link_libraries(cplex_solve cplex-library cplex-concert ilocplex
         pthread m lemon-library)
 target_compile_options(cplex_solve PRIVATE -m64 -O -fPIC -fno-strict-aliasing

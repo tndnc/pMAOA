@@ -14,7 +14,7 @@ namespace ace {
 
     std::list<maoa::Tour> aco_heuristic::run(int nb_iter, int nb_ants, float beta, float alpha, float q0, float t0) {
 
-        //std::cout<<"Running, graph has "<< g->nodeNum() <<" nodes\n";         //initialization ants
+        //std::cout<<"Running, graph has "<< g->_nodeNum() <<" nodes\n";         //initialization ants
 
         ant Ants[nb_ants];
         for (int i = 0; i < nb_ants; i++) {
