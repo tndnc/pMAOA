@@ -41,7 +41,8 @@ Graph::Graph(const string &filename) : _nodeMap(*this) {
             readingDemand = false;
             readingDepot = true;
         }
-        else if(line.find("VEHICLES") != string::npos or line.find("trucks") != string::npos){
+        else if(line.find("VEHICLES") != string::npos
+                or line.find("trucks") != string::npos){
             std::regex r ("[[:digit:]]+");
             std::smatch s;
             std::regex_search(line,s,r);
@@ -49,7 +50,8 @@ Graph::Graph(const string &filename) : _nodeMap(*this) {
 
         }
         else {
-            // Extract data from the line. There is at most three strings that matter to us for each line.
+            // Extract data from the line. There is at most three strings that
+            // matter to us for each line.
             std::stringstream lineStream(line);
             string temp;
             i = 0;

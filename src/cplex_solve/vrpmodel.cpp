@@ -54,7 +54,7 @@ addMIPStart(std::list<maoa::Tour> &startSolution) {
         startVal.add(1);
         // Arcs of tour
         for (auto it = tour.cities.begin(); it != --tour.cities.end(); it++) {
-            int idx = edgeToIdx(*it, *std::next(it));
+            idx = edgeToIdx(*it, *std::next(it));
             startVar.add(_x_vars[idx]);
             startVal.add(1);
         }
@@ -73,7 +73,6 @@ createVars() {
     int nodeNum = _g.nodeNum();
 
     for (int i = 0; i < nodeNum; i++) {
-
         for (int j = 0; j < nodeNum; j++) {
             if (i == j) continue;
 
@@ -151,7 +150,7 @@ createConstraints() {
         float di = _g.getDemand(edge.first);
         lhs = _w_vars[edge.first] - _w_vars[edge.second];
         rhs = di - (capacity + di) * (1 - x.second);
-        _model.add(lhs -rhs >= 0);
+        _model.add(lhs - rhs >= 0);
     }
 }
 
@@ -237,9 +236,7 @@ ILOLAZYCONSTRAINTCALLBACK3(LazycutVRPMinCut,
     lemon::NagamochiIbaraki<maoa::Graph,
             maoa::Graph::EdgeMap<double>> mc(_g, capacities);
     mc.init();
-    for (int i = 0; i < nodeNum-1; i++) {
-        mc.processNextPhase();
-    }
+    for (int i = 0; i < nodeNum-1; i++) { mc.processNextPhase(); }
     mc.minCutMap(minCutMap);
     IloExpr cutCstr(_env);
     int cutSize = 0;

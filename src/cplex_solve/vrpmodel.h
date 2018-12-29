@@ -30,28 +30,38 @@ namespace cplex {
          * @param g Graph on which the model is based.
          */
         explicit VrpModel(const maoa::Graph &g);
+
         /*! Creates the decision variables needed to solve the problem. */
         virtual void createVars() =0;
+
         /*! Sets the minimizing objective. */
         virtual void setObjective();
+
         /*! Creates all the problem's constraints and adds them to the model. */
         virtual void createConstraints() =0;
+
         /*! Adds a mip start to cplex */
         void addMIPStart(std::list<maoa::Tour> &startSolution);
+
         /*! Writes the model in LP format to the file specified. */
         void exportModel(const char* filename) const {
             _cplex.exportModel(filename);
         }
+
         /*! Starts the CPLEX solving process. Returns CPLEX Status when done. */
         IloBool solve() { return _cplex.solve(); }
+
         /*! Get solution value */
         IloNum getSolutionValue() { return _cplex.getObjValue(); }
+
         /*! Get solution status */
         IloAlgorithm::Status getStatus() { return _cplex.getStatus(); }
+
         /*! When a solution is found, this function can be used to draw the
          * solution with gnuplot.
          */
         void drawSolution();
+
         /*!
          * Returns a unique numeric index for an edge in the form (i,j).
          * @param i The first node.
@@ -59,6 +69,7 @@ namespace cplex {
          * @return The corresponding index.
          */
         virtual int edgeToIdx(int i, int j) const =0;
+
         /*! Returns the pair of node indices (i,j) corresponding to an index
          * obtained via \p edgeToIdx.
          * @param idx The index.

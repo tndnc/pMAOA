@@ -67,7 +67,7 @@ namespace idesc {
      * @param g Graph containing the tours.
      */
     void descent(std::list<Tour> &tours, const Graph &g);
-    
+
 } // namespace idesc
 } // namespace maoa
 
