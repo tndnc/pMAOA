@@ -6,7 +6,7 @@ set(Qt5_DIR "/Applications/Qt/5.12.0/clang_64/lib/cmake/Qt5")
 
 # Find libraries
 find_package(CPLEX)
-find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+#find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 find_package(LEMON)
 
 # Set source files

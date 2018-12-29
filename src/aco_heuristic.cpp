@@ -122,7 +122,7 @@ namespace ace {
                 //std::cout << 0 << " ";
                 a.distance += g->getDistance(a.position, g->depotId());
                 a.position = 0;
-                a.capacity =  100;
+                a.capacity =  g->capacity();
                 it = a.path.begin();
                 a.path.insert(it, 0);
                 return;
@@ -164,7 +164,7 @@ namespace ace {
                 //std::cout << 0 << " ";
                 a.distance += g->getDistance(a.position, g->depotId());
                 a.position = 0;
-                a.capacity =  100;
+                a.capacity =  g->capacity();;
                 it = a.path.begin();
                 a.path.insert(it, 0);
                 return;
