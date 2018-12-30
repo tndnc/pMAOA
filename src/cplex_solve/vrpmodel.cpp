@@ -345,12 +345,12 @@ ILOLAZYCONSTRAINTCALLBACK4(VrpCycleCut,
 
 maoa::cplex::VrpModelDirectedCut::
 VrpModelDirectedCut(const maoa::Graph &g) : VrpModelDirected(g) {
-    _cplex.use(VrpDirectedCycleCut(_env, *this, _g, _x_vars, 1));
+    _cplex.use(VrpCycleCut(_env, *this, _g, _x_vars, 1));
 }
 
 maoa::cplex::VrpModelUndirectedCut::
 VrpModelUndirectedCut(const maoa::Graph &g) : VrpModel(g) {
-    _cplex.use(VrpDirectedCycleCut(_env, *this, _g, _x_vars, 2));
+    _cplex.use(VrpCycleCut(_env, *this, _g, _x_vars, 2));
 }
 
 void maoa::cplex::VrpModelUndirectedCut::

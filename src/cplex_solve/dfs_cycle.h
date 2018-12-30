@@ -6,9 +6,9 @@
 #include "vrpmodel.h"
 
 /*!
- * This class can be used to detect and retrieve a cycle in a directed graph.
+ * This class can be used to detect and retrieve a cycle in a graph.
  * It is used in conjunction with a \p VrpModel who must provide a way to
- * index the arcs of the graph. \p reset() must be called between each search.
+ * index the edges of the graph. \p reset() must be called between each search.
  * The underlying algorithm is a Depth-First-Search performed with recursion.
  */
 class FindCycleUtil {
@@ -16,13 +16,13 @@ public:
     /*!
      * Constructor.
      * @param nodeNum Number of nodes in the graph.
-     * @param a Boolean map that specifies which arcs are present in the graph.
-     * @param m \p VrpModel used to index the arcs.
+     * @param a Boolean map that specifies which edges are present in the graph.
+     * @param m \p VrpModel used to index the edges.
      */
     explicit FindCycleUtil(
             int nodeNum,
-            std::unordered_map<int, bool> &a,
-            maoa::cplex::VrpModel &m) : _arcs(&a), _m(&m), _nodeNum(nodeNum),
+            std::unordered_map<int, bool> &e,
+            maoa::cplex::VrpModel &m) : _edges(&e), _m(&m), _nodeNum(nodeNum),
                                         _cycleFound(false), _cycleStart(-1)
     {
         reset();
@@ -59,7 +59,7 @@ public:
 private:
     int _nodeNum, _cycleStart;
     bool _cycleFound;
-    std::unordered_map<int, bool> *_arcs;
+    std::unordered_map<int, bool> *_edges;
     maoa::cplex::VrpModel *_m;
     std::unique_ptr<bool[]> _visited, _recursionStack;
 
@@ -81,7 +81,7 @@ private:
             if (u == v) continue;
 
             int idx = _m->edgeToIdx(u, v);
-            if ((*_arcs)[idx]) { // v is adjacent to u.
+            if ((*_edges)[idx]) { // v is adjacent to u.
                 if(!_visited[v] && findCycle(u, v, cycle)) {
                     if (v == _cycleStart) {
                         // Recursion has reached the start of the cycle.
