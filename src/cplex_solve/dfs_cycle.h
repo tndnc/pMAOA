@@ -50,7 +50,7 @@ public:
      */
     bool getCycle(std::set<int> &cycle) {
         for (int u = 0; u < _nodeNum; u++) {
-            if (findCycle(u, cycle)) {
+            if (findCycle(-1, u, cycle)) {
                 return true;
             }
         }
@@ -70,17 +70,19 @@ private:
      * @return \a True if a cycle was found while visiting \a u. \a False
      * otherwise.
      */
-    bool findCycle(int u, std::set<int> &cycle) {
+    bool findCycle(int parent, int u, std::set<int> &cycle) {
         if (_visited[u]) return false;
 
         _visited[u] = true;
         _recursionStack[u] = true;
 
         for (int v = 0; v < _nodeNum; v++) {
+            if (v == parent) continue;
             if (u == v) continue;
+
             int idx = _m->edgeToIdx(u, v);
             if ((*_arcs)[idx]) { // v is adjacent to u.
-                if(!_visited[v] && findCycle(v, cycle)) {
+                if(!_visited[v] && findCycle(u, v, cycle)) {
                     if (v == _cycleStart) {
                         // Recursion has reached the start of the cycle.
                         _cycleFound = false;

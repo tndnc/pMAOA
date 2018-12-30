@@ -126,6 +126,20 @@ namespace cplex {
         explicit VrpModelDirectedCut(const Graph &g);
     };
 
+    class VrpModelUndirectedCut : public VrpModel {
+    public:
+        explicit VrpModelUndirectedCut(const Graph &g);
+        void createVars() override;
+        void createConstraints() override;
+        int edgeToIdx(int i, int j) const override {
+            if (i < j) return i * _g.nodeNum() + j;
+            else return j * _g.nodeNum() + i;
+        }
+        _edge_t idxToEdge(int idx) const override {
+            return std::make_pair(idx / _g.nodeNum(), idx % _g.nodeNum());
+        }
+    };
+
 } // namespace cplex
 } // namespace maoa
 

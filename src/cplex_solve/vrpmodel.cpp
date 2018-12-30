@@ -263,37 +263,11 @@ VrpModelDirectedMTZ(const maoa::Graph &g) : VrpModelDirected(g) {
     _cplex.use(UsercutVRPMinCut(_env, *this, _g, _x_vars));
 }
 
-//void maoa::cplex::VrpUndirectedCut::
-//addCycleCutConstraint() {
-//    int nodeNum = _g.nodeNum();
-//    int depotId = _g.depotId();
-
-//    UnionFind uf(_nodeNum);
-//
-//    for (int i = 0; i < _nodeNum; i++) {
-//        for (int j = 0; j < _nodeNum; j++) {
-//            if (i == j) continue;
-//            if (i == depotId or j == depotId) continue;
-//
-//            int idx = edgeToIdx(i, j);
-//
-//            if (_cplex.getValue(_x_vars[idx]) > epsilon) {
-//                int pi = uf.find(i);
-//                int pj = uf.find(j);
-//                if (pi == pj) std::cout << "Cycle found!" << std::endl;
-//
-//                uf.merge(pi, pj);
-//            };
-//        }
-//    }
-
-
-//}
-
-ILOLAZYCONSTRAINTCALLBACK3(VrpDirectedCycleCut,
-                           maoa::cplex::VrpModelDirectedCut&, m,
+ILOLAZYCONSTRAINTCALLBACK4(VrpCycleCut,
+                           maoa::cplex::VrpModel&, m,
                            const maoa::Graph&, _g,
-                           maoa::cplex::_var_map&, x) {
+                           maoa::cplex::_var_map&, x,
+                           int, coeff) {
 
     int nodeNum = _g.nodeNum();
     int depotId = _g.depotId();
@@ -329,7 +303,9 @@ ILOLAZYCONSTRAINTCALLBACK3(VrpDirectedCycleCut,
                 cycleCstr += x[idx];
             }
         }
-        add(cycleCstr >= ceil(demandSum / _g.capacity()), IloCplex::UseCutPurge);
+        add(cycleCstr >= coeff * ceil(demandSum / _g.capacity()),
+            IloCplex::UseCutPurge);
+        return;
     }
 
     // Add edges from and to depot node
@@ -345,6 +321,7 @@ ILOLAZYCONSTRAINTCALLBACK3(VrpDirectedCycleCut,
         int demandSum = 0;
         IloExpr cycleCstr(getEnv());
         for (auto &node : cycle) {
+
             if (node == depotId) continue;
             demandSum += _g.getDemand(node);
             for (int v = 0; v < nodeNum; v++) {
@@ -358,7 +335,8 @@ ILOLAZYCONSTRAINTCALLBACK3(VrpDirectedCycleCut,
             }
         }
         if (demandSum > _g.capacity()) {
-            add(cycleCstr >= ceil(demandSum / _g.capacity()), IloCplex::UseCutForce);
+            add(cycleCstr >= coeff * ceil(demandSum / _g.capacity()),
+                IloCplex::UseCutForce);
         }
         cycle.clear();
         fcu.reset();
@@ -367,6 +345,58 @@ ILOLAZYCONSTRAINTCALLBACK3(VrpDirectedCycleCut,
 
 maoa::cplex::VrpModelDirectedCut::
 VrpModelDirectedCut(const maoa::Graph &g) : VrpModelDirected(g) {
-    _cplex.use(VrpDirectedCycleCut(_env, *this, _g, _x_vars));
+    _cplex.use(VrpDirectedCycleCut(_env, *this, _g, _x_vars, 1));
 }
 
+maoa::cplex::VrpModelUndirectedCut::
+VrpModelUndirectedCut(const maoa::Graph &g) : VrpModel(g) {
+    _cplex.use(VrpDirectedCycleCut(_env, *this, _g, _x_vars, 2));
+}
+
+void maoa::cplex::VrpModelUndirectedCut::
+createVars() {
+    int nodeNum = _g.nodeNum();
+
+    for (int i = 0; i < nodeNum; i++) {
+        for (int j = i + 1; j < nodeNum; j++) {
+
+            int idx = edgeToIdx(i, j);
+            _x_vars[idx] = IloNumVar(_env, 0, 1, ILOBOOL);
+            std::ostringstream varName;
+            varName << "x_" << i << "_" << j;
+            _x_vars[idx].setName(varName.str().c_str());
+        }
+    }
+}
+
+void maoa::cplex::VrpModelUndirectedCut::
+createConstraints() {
+    int nodeNum = _g.nodeNum();
+    int vehiclesNum = _g.vehiclesNum();
+    int depotId = _g.depotId();
+    IloRangeArray CC(_env);
+
+    // Constraints (1)-(2)
+    IloExpr cst_12(_env);
+    for (int i = 0; i < nodeNum; i++) {
+        if (i == depotId) continue;
+        int idx = edgeToIdx(0, i);
+        cst_12 += _x_vars[idx];
+    }
+    CC.add(cst_12 <= 2 * vehiclesNum);
+
+    // Constraints (3)
+    for (int i = 0; i < nodeNum; i++) {
+        if (i == depotId) continue;
+        IloExpr cst_3(_env);
+        for (int j = 0; j < nodeNum; j++) {
+            if (i == j) continue;
+
+            int idx = edgeToIdx(i, j);
+            cst_3 += _x_vars[idx];
+        }
+        CC.add(cst_3 == 2);
+    }
+
+    _model.add(CC);
+}

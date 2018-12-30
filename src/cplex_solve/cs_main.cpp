@@ -21,11 +21,12 @@ int main (int argc, char** argv) {
     std::list<maoa::Tour> startSolution = maoa::cw::getFeasible(g);
     maoa::idesc::descent(startSolution, g);
 
-    maoa::cplex::VrpModelDirectedCut vrpModel(g);
+    maoa::cplex::VrpModelUndirectedCut vrpModel(g);
+
     vrpModel.createVars();
     vrpModel.setObjective();
     vrpModel.createConstraints();
-//    vrpModel.addMIPStart(startSolution);
+    vrpModel.addMIPStart(startSolution);
     vrpModel.exportModel("model.lp");
     if (not vrpModel.solve()) {
         std::cerr << "Failed to optimize LP" << std::endl;
